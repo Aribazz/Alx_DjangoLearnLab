@@ -1,9 +1,11 @@
 from django.shortcuts import render
-from django.views.generic.detail import DetailView,CreateView,TemplateView
+from django.views.generic.detail import DetailView, CreateView, TemplateView, UpdateView, DeleteView
 from .models import Books
 from .models import Library
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import permission_required
+from django.utils.decorators import method_decorator
 from django.url import reverse_lazy
 from django.contrib.auth import login
 
@@ -34,3 +36,24 @@ class LibrarianView(TemplateView):
 @user_passes_test(lambda u: u.userprofile.role == "Member")
 class MemberView(TemplateView):
     template_name = "relationship_app/member_view.html"
+
+
+@method_decorator(permission_required("relationship_app.can_add_book", raise_exception=True), name ="can add book")
+class BookCreateView(CreateView):
+    model = Book
+    fields = ["title", "author", "published_date"]
+    template_name = "relationship_app/book_form.html"
+    sources_url = reverse_lazy('book_list')
+
+@method_decorator(permission_required("relationship_app.can_change_book", raise_exception=True), name ="can change book")
+class BookUpdateView(UpdateView):
+    model = Book
+    fields = ["title", "author", "published_date"]
+    template_name = "relationship_app/book_form.html"
+    sources_url = reverse_lazy('book_list')
+
+@method_decorator(permission_required("relationship_app.can_delete_book", raise_exception=True), name ="can delete book")
+class BookDeleteView(DeleteView):
+    model = Book
+    template_name = "relationship_app/book_form.html"
+    sources_url = reverse_lazy('book_list')
