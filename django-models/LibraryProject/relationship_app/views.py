@@ -4,6 +4,7 @@ from .models import Books
 from .models import Library
 from django.contrib.auth.forms import UserCreationForm
 from django.url import reverse_lazy
+from django.contrib.auth import login
 
 
 def list_books(request):
@@ -20,4 +21,3 @@ class SignUpView(CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy("login")
     template_name = "relationship_app/register.html"
-    
