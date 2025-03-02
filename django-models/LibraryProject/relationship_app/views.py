@@ -23,7 +23,7 @@ class SignUpView(CreateView):
     success_url = reverse_lazy("login")
     template_name = "relationship_app/register.html"
 
-@user_passes_test(lambda u: u.userprofile.role == "Admin")
+@user_passes_test(lambda u: u.userprofile.role == 'Admin')
 class AdminView(TemplateView):
     template_name = "relationship_app/admin_view.html"
 
