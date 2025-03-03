@@ -12,5 +12,5 @@ admin.site.register(Book,BookAdmin)
 class CustomUserAdmin(admin.ModelAdmin):
     list_display = ["username", "email", "date_of_birth", "profile_photo"]
 
-admin.site.register(CustomUser,CustomUserAdmin)
+admin.site.register(CustomUser, CustomUserAdmin)
     
