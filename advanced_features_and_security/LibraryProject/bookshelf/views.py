@@ -9,3 +9,5 @@ def book_list(request):
     all_books = Book.objects.all()
     response = render(request, "bookshelf/book_list.html", {"all_books":all_books})
     return response
+
+
