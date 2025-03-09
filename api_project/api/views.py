@@ -1,6 +1,6 @@
 from rest_framework.generics import ListAPIView
 from .models import Book
-from .serializersa import BookSerializer
+from .serializers import BookSerializer
 
 
 # Create your views here.
