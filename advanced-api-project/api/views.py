@@ -7,6 +7,7 @@ from django.views.generic.edit import CreateView
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class AuthorListCreateView(generics.ListCreateAPIView):
@@ -36,6 +37,13 @@ class BookRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 class BookListView(ListView):
     """Django Class-Based View to list all books."""
     model = Book
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['title', 'author', 'publication_year']
+    search_fields = ['title', 'author__name']
+    ordering_fields = ['title', 'publication_year']
+
 
     def render_to_response(self, context, **response_kwargs):
         books = list(context['object_list'].values())  # Convert QuerySet to list of dicts
