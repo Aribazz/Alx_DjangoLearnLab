@@ -1,4 +1,5 @@
 from rest_framework import generics, permissions, filters
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from .models import Author, Book
 from .serializers import AuthorSerializer, BookSerializer
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView
