@@ -7,8 +7,7 @@ from django.views.generic.edit import CreateView
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 import json
-from django_filters.rest_framework import DjangoFilterBackend
-
+from django_filters import rest_framework
 
 class AuthorListCreateView(generics.ListCreateAPIView):
     queryset = Author.objects.all()
