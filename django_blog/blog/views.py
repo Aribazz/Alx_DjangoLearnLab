@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django import forms
 from .models import Profile
 from django.contrib.auth.forms import UserChangeForm
-
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
