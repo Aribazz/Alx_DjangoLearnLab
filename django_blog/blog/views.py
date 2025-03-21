@@ -7,7 +7,16 @@ from django import forms
 from .models import Profile
 from django.contrib.auth.forms import UserChangeForm
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from .models import BlogPost
+from .forms import BlogPostForm
+
+
 # Create your views here.
+
+
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
 
@@ -48,3 +57,55 @@ def edit_profile(request):
 # Logout User
 class CustomLogoutView(LogoutView):
     next_page = "login" 
+
+
+
+# List all blog posts
+class PostListView(ListView):
+    model = BlogPost
+    template_name = "blog/post_list.html"
+    context_object_name = "posts"
+    ordering = ["-created_at"]
+
+# Show details of a single post
+class PostDetailView(DetailView):
+    model = BlogPost
+    template_name = "blog/post_detail.html"
+    form_class = BlogPostForm
+
+# Create a new blog post (only for logged-in users)
+class PostCreateView(LoginRequiredMixin, CreateView):
+    model = BlogPost
+    template_name = "blog/post_form.html"
+    fields = ["title", "content"]
+    form_class = BlogPostForm
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+# Update an existing post (only for the author)
+class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = BlogPost
+    template_name = "blog/post_form.html"
+    fields = ["title", "content"]
+    form_class = BlogPostForm
+
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author
+
+# Delete a post (only for the author)
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = BlogPost
+    template_name = "blog/post_confirm_delete.html"
+    success_url = reverse_lazy("post-list")
+
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author
