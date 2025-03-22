@@ -1,7 +1,6 @@
 from django import forms
-from .models import BlogPost
-from .models import Comment
-from .models import Tag, Post
+from .models import BlogPost, Comment, Tag, Post
+from taggit.forms import TagWidget
 
 
 class BlogPostForm(forms.ModelForm):
@@ -11,6 +10,7 @@ class BlogPostForm(forms.ModelForm):
         widgets = {
             "title": forms.TextInput(attrs={"class": "form-control", "placeholder": "Enter post title"}),
             "content": forms.Textarea(attrs={"class": "form-control", "placeholder": "Write your content here", "rows": 5}),
+            "tag": TagWidget()
         }
 
     def clean_title(self):
