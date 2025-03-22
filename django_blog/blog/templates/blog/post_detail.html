@@ -1,4 +1,5 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %} 
+{% block content %}
 <h2>{{ object.title }}</h2>
 <p><strong>By:</strong> {{ object.author.username }}</p>
 <p><strong>Published on:</strong> {{ object.created_at|date:"F d, Y" }}</p>
@@ -9,6 +10,17 @@
 <p><strong>By:</strong> {{ object.author.username }}</p>
 <p><strong>Published on:</strong> {{ object.created_at|date:"F d, Y" }}</p>
 <p>{{ object.content }}</p>
+
+<p><strong>Tags:</strong>
+    {% for tag in post.tags.all %}
+        <a href="{% url 'tag-posts' tag.name %}" class="badge bg-primary">#{{ tag.name }}</a>
+    {% empty %}
+        <span>No tags</span>
+    {% endfor %}
+</p>
+
+<a href="{% url 'post-list' %}" class="btn btn-secondary">Back to All Posts</a>
+
 
 {% if user == object.author %}
 <a href="{% url 'post-update' object.id %}" class="btn btn-warning">Edit</a>
@@ -31,5 +43,10 @@
         <button type="submit" class="btn btn-primary">Post Comment</button>
     </form>
 {% else %}
+    <p><strong>Tags:</strong>
+    {% for tag in post.tags.all %}
+        <a href="{% url 'tag-posts' tag.name %}">#{{ tag.name }}</a>
+    {% endfor %}
+</p>
     <p><a href="{% url 'login' %}">Log in</a> to post a comment.</p>
 {% endif %}

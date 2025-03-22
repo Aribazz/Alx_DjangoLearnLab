@@ -4,7 +4,6 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
-from .models import Profile
 from django.contrib.auth.forms import UserChangeForm
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
@@ -12,8 +11,9 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import BlogPost
 from .forms import BlogPostForm
-from .models import Post, Comment
+from .models import Post, Comment, Tag
 from .forms import CommentForm
+from django.db.models import Q
 
 
 # Create your views here.
@@ -157,3 +157,44 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def get_success_url(self):
         """Redirect back to the post after deleting."""
         return self.object.post.get_absolute_url()
+    
+
+class TagPostListView(ListView):
+    """Displays all posts associated with a specific tag."""
+    model = Post
+    template_name = "blog/tag_posts.html"
+    context_object_name = "posts"
+
+    def get_queryset(self):
+        self.tag = get_object_or_404(Tag, name=self.kwargs["tag_name"])
+        tag_name = self.kwargs["tag_name"]
+        return Post.objects.filter(tag__name__iexact=tag_name)
+
+
+class SearchResultsView(ListView):
+    """Handles searching for blog posts by title, content, or tags."""
+    model = Post
+    template_name = "blog/search_results.html"
+    context_object_name = "posts"
+
+    def get_queryset(self):
+        query = self.request.GET.get("q")  # Get the search query from the request
+        if query:
+            return Post.objects.filter(
+                Q(title__icontains=query) |  # Search in title
+                Q(content__icontains=query) |  # Search in content
+                Q(tags__name__icontains=query)  # Search in tags (if using django-taggit)
+            ).distinct()  # Avoid duplicate results
+        return Post.objects.none()
+
+
+class TagPostListView(ListView):
+    """Displays all posts associated with a specific tag."""
+    model = Post
+    template_name = "blog/tag_posts.html"
+    context_object_name = "posts"
+
+    def get_queryset(self):
+        """Filters posts by the tag provided in the URL."""
+        tag_name = self.kwargs["tag_name"]
+        return Post.objects.filter(tags__name__iexact=tag_name)

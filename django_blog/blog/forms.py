@@ -1,6 +1,7 @@
 from django import forms
 from .models import BlogPost
 from .models import Comment
+from .models import Tag, Post
 
 
 class BlogPostForm(forms.ModelForm):
@@ -36,3 +37,14 @@ class CommentForm(forms.ModelForm):
             raise forms.ValidationError("Comment cannot be empty.")
         return content
 
+
+class PostForm(forms.ModelForm):
+    tags = forms.ModelMultipleChoiceField(
+        queryset=Tag.objects.all(),
+        widget=forms.CheckboxSelectMultiple,  # Allows selecting multiple tags
+        required=False
+    )
+
+    class Meta:
+        model = Post
+        fields = ["title", "content", "tags"]

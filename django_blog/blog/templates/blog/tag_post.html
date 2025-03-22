@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Posts tagged with "{{ tag.name }}"</h2>
+
+{% for post in posts %}
+    <h3><a href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h3>
+    <p>By {{ post.author }} | {{ post.created_at|date:"F d, Y" }}</p>
+    <hr>
+{% empty %}
+    <p>No posts found for this tag.</p>
+{% endfor %}
+{% endblock %}
