@@ -1,15 +1,35 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "base.html" %} {% block content %}
+<h2>{{ object.title }}</h2>
+<p><strong>By:</strong> {{ object.author.username }}</p>
+<p><strong>Published on:</strong> {{ object.created_at|date:"F d, Y" }}</p>
+<p>{{ object.content }}</p>
+
+<h3>Comments</h3>
 <h2>{{ object.title }}</h2>
 <p><strong>By:</strong> {{ object.author.username }}</p>
 <p><strong>Published on:</strong> {{ object.created_at|date:"F d, Y" }}</p>
 <p>{{ object.content }}</p>
 
 {% if user == object.author %}
-    <a href="{% url 'post-update' object.id %}" class="btn btn-warning">Edit</a>
-    <a href="{% url 'post-delete' object.id %}" class="btn btn-danger">Delete</a>
+<a href="{% url 'post-update' object.id %}" class="btn btn-warning">Edit</a>
+<a href="{% url 'post-delete' object.id %}" class="btn btn-danger">Delete</a>
+{% endif %} {% if user.is_authenticated and user == comment.author %}
+<a href="{% url 'comment-update' comment.id %}" class="btn btn-warning">Edit</a>
+<a href="{% url 'comment-delete' comment.id %}" class="btn btn-danger"
+  >Delete</a
+>
 {% endif %}
 
 <a href="{% url 'post-list' %}" class="btn btn-secondary">Back to Posts</a>
 {% endblock %}
 
+{% if user.is_authenticated %}
+    <h3>Leave a Comment:</h3>
+    <form method="POST" action="{% url 'comment-create' post_id=object.id %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Post Comment</button>
+    </form>
+{% else %}
+    <p><a href="{% url 'login' %}">Log in</a> to post a comment.</p>
+{% endif %}

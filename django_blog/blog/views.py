@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.forms import UserCreationForm
@@ -12,6 +12,8 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import BlogPost
 from .forms import BlogPostForm
+from .models import Post, Commit
+from .forms import CommentForm
 
 
 # Create your views here.
@@ -109,3 +111,49 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         post = self.get_object()
         return self.request.user == post.author
+
+
+class CommentCreateView(LoginRequiredMixin, CreateView):
+    model = Commit
+    form_class = CommentForm
+    template_name = "blog/post_detail.html"  # Uses the post detail template
+
+    def form_valid(self, form):
+        """Assign the comment to the logged-in user and associated post."""
+        form.instance.author = self.request.user
+        form.instance.post = get_object_or_404(Post, pk=self.kwargs['pk'])
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        """Redirect back to the post after commenting."""
+        return self.object.post.get_absolute_url()
+
+
+# View to edit a comment (Only the author can edit)
+class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Commit
+    form_class = CommentForm
+    template_name = "blog/comment_form.html"
+
+    def test_func(self):
+        """Ensure only the comment's author can edit."""
+        comment = self.get_object()
+        return self.request.user == comment.author
+
+    def get_success_url(self):
+        """Redirect back to the post after updating."""
+        return self.object.post.get_absolute_url()
+
+# View to delete a comment (Only the author can delete)
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Commit
+    template_name = "blog/comment_confirm_delete.html"
+
+    def test_func(self):
+        """Ensure only the comment's author can delete."""
+        comment = self.get_object()
+        return self.request.user == comment.author
+
+    def get_success_url(self):
+        """Redirect back to the post after deleting."""
+        return self.object.post.get_absolute_url()
