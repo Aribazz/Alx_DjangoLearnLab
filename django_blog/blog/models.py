@@ -33,7 +33,7 @@ class BlogPost(models.Model):
         return reverse("post-detail", kwargs={"pk": self.pk})    
     
 
-class Commit(models.Model):
+class Comment(models.Model):
     post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="comments")  # Many-to-One with Post
     author = models.ForeignKey(User, on_delete=models.CASCADE)  
     content = models.TextField()  

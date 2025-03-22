@@ -1,6 +1,6 @@
 from django import forms
 from .models import BlogPost
-from .models import Commit
+from .models import Comment
 
 
 class BlogPostForm(forms.ModelForm):
@@ -23,7 +23,7 @@ class CommentForm(forms.ModelForm):
     """Form for adding and editing comments."""
     
     class Meta:
-        model = Commit
+        model = Comment
         fields = ["content"]
         widgets = {
             "content": forms.Textarea(attrs={"class": "form-control", "placeholder": "Write your comment...", "rows": 3}),

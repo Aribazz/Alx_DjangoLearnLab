@@ -12,7 +12,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import BlogPost
 from .forms import BlogPostForm
-from .models import Post, Commit
+from .models import Post, Comment
 from .forms import CommentForm
 
 
@@ -114,7 +114,7 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 
 class CommentCreateView(LoginRequiredMixin, CreateView):
-    model = Commit
+    model = Comment
     form_class = CommentForm
     template_name = "blog/post_detail.html"  # Uses the post detail template
 
@@ -131,7 +131,7 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 
 # View to edit a comment (Only the author can edit)
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    model = Commit
+    model = Comment
     form_class = CommentForm
     template_name = "blog/comment_form.html"
 
@@ -146,7 +146,7 @@ class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 # View to delete a comment (Only the author can delete)
 class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    model = Commit
+    model = Comment
     template_name = "blog/comment_confirm_delete.html"
 
     def test_func(self):
