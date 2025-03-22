@@ -198,3 +198,15 @@ class TagPostListView(ListView):
         """Filters posts by the tag provided in the URL."""
         tag_name = self.kwargs["tag_name"]
         return Post.objects.filter(tags__name__iexact=tag_name)
+    
+
+class PostByTagListView(ListView):
+    """Displays all posts associated with a specific tag."""
+    model = Post
+    template_name = "blog/tag_posts.html"
+    context_object_name = "posts"
+
+    def get_queryset(self):
+        """Filter posts by the tag from the URL."""
+        tag = get_object_or_404(Tag, slug=self.kwargs["tag_slug"])
+        return Post.objects.filter(tags__in=[tag])
