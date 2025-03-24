@@ -5,7 +5,7 @@ from django.contrib.auth.models import AbstractUser
 
 
 class CustomerUser(AbstractUser):
-    bio = models.CharField(max_length=200)
+    bio = models.TextField(max_length=200)
     profile_picture = models.ImageField(upload_to="profile_pictures/", blank=True, null=True)
     followers = models.ManyToManyField("self", symmetrical=False, related_name="following")
 
