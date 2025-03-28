@@ -67,7 +67,7 @@ class LoginView(APIView):
 class UserProfileView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
-    queryset = CustomerUser.objects.all()
+    queryset = CustomUser.objects.all()
 
     def get(self, request):
         serializer = UserSerializer(request.user)
