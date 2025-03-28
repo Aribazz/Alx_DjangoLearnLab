@@ -1,8 +1,11 @@
 from django.test import TestCase
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 from rest_framework import status
 from .models import Post
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class PostAPITestCase(APITestCase):
@@ -49,3 +52,25 @@ class PostAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
+class FeedTests(APITestCase):
+
+    def setUp(self):
+        """Set up users and posts"""
+        self.user1 = User.objects.create_user(username="user1", password="pass123")
+        self.user2 = User.objects.create_user(username="user2", password="pass123")
+        self.client.login(username="user1", password="pass123")
+
+        self.post = Post.objects.create(author=self.user2, content="Test post")
+
+    def test_feed_without_following(self):
+        """Check feed when user is not following anyone"""
+        response = self.client.get('/posts/feed/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 0)
+
+    def test_feed_with_following(self):
+        """Check feed when user follows another user"""
+        self.user1.following.add(self.user2)
+        response = self.client.get('/posts/feed/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
