@@ -55,7 +55,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 def user_feed(request):
     """Generate a feed showing posts from users the current user follows."""
     followed_users = request.user.following.all()
-    posts = Post.objects.filter(author__in=followed_users).order_by('-created_at')
+    posts = Post.objects.filter(author__in=following_users).order_by('-created_at')
     
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)
