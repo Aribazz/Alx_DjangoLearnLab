@@ -11,12 +11,12 @@ from django.shortcuts import get_object_or_404
 # from .models import CustomerUser
 from rest_framework import generics, permissions, status
 from notifications.models import Notifications 
-CustomerUser = get_user_model()
+CustomUser = get_user_model()
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def follow_user(request, user_id):
-    user_to_follow = get_object_or_404(CustomerUser, id=user_id)
+    user_to_follow = get_object_or_404(CustomUser, id=user_id)
     if request.user in user_to_follow.followers.all():
         user_to_follow.followers.remove(request.user)
         return Response({"message": "Unfollowed successfully"})
@@ -30,7 +30,7 @@ def follow_user(request, user_id):
 @permission_classes([IsAuthenticated])
 def unfollow_user(request, user_id):
     """Unfollow a user."""
-    user_to_unfollow = get_object_or_404(CustomerUser, id=user_id)
+    user_to_unfollow = get_object_or_404(CustomUser, id=user_id)
     
     if request.user == user_to_unfollow:
         return Response({"error": "You cannot unfollow yourself."}, status=status.HTTP_400_BAD_REQUEST)
@@ -68,7 +68,7 @@ class LoginView(APIView):
 class UserProfileView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
-    queryset = CustomerUser.objects.all()
+    queryset = CustomUser.objects.all()
 
     def get(self, request):
         serializer = UserSerializer(request.user)
