@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.response import Response
@@ -8,7 +8,10 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import RegisterSerializer, UserSerializer
 from rest_framework.decorators import api_view, permission_classes
 from django.shortcuts import get_object_or_404
-from .models import CustomerUser
+# from .models import CustomerUser
+from rest_framework import generics
+
+CustomerUser = get_user_model()
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -26,7 +29,7 @@ def follow_user(request, user_id):
 @permission_classes([IsAuthenticated])
 def unfollow_user(request, user_id):
     """Unfollow a user."""
-    user_to_unfollow = get_object_or_404(CustomUser, id=user_id)
+    user_to_unfollow = get_object_or_404(CustomerUser, id=user_id)
     
     if request.user == user_to_unfollow:
         return Response({"error": "You cannot unfollow yourself."}, status=status.HTTP_400_BAD_REQUEST)
@@ -61,8 +64,9 @@ class LoginView(APIView):
         return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
     
 
-class UserProfileView(APIView):
+class UserProfileView(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = UserSerializer
 
     def get(self, request):
         serializer = UserSerializer(request.user)
