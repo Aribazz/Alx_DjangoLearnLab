@@ -6,7 +6,7 @@ from django.conf import settings
 # Create your models here.
 
 
-class Notifications(models.Model):
+class Notification(models.Model):
     recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications")
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications_sent")
     verb = models.CharField(max_length=255)  # Action description (e.g., "liked your post")
