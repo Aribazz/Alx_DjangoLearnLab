@@ -6,7 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from notifications.models import Notifications
+from notifications.models import Notification
 
 
 class IsAuthorOrReadOnly(permissions.BasePermission):
@@ -68,12 +68,7 @@ def like_post(request, pk):
 
     if created:
         # Create a notification for the post author
-        Notifications.objects.create(
-            recipient=post.author,
-            actor=request.user,
-            verb="liked your post",
-            target=post
-        )
+        Notification.objects.create(recipient=post.author, actor=request.user, verb="liked your post", target=post)
         return Response({"message": "Post liked successfully"}, status=status.HTTP_201_CREATED)
 
     else:
@@ -93,11 +88,6 @@ def comment_on_post(request, pk):
     comment = Comment.objects.create(user=request.user, post=post, content=comment_text)
 
     # Notify the post author
-    Notifications.objects.create(
-        recipient=post.author,
-        actor=request.user,
-        verb="commented on your post",
-        target=post
-    )
+    Notification.objects.create(recipient=post.author, actor=request.user, verb="commented on your post", target=post)
 
     return Response({"message": "Comment added successfully"}, status=status.HTTP_201_CREATED)
