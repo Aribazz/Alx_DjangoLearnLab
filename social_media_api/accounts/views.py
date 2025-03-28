@@ -10,7 +10,7 @@ from rest_framework.decorators import api_view, permission_classes
 from django.shortcuts import get_object_or_404
 # from .models import CustomerUser
 from rest_framework import generics, permissions, status
-from notifications.models import Notifications 
+from notifications.models import Notification 
 CustomUser = get_user_model()
 
 @api_view(['POST'])
