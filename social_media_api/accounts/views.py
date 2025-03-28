@@ -10,7 +10,7 @@ from rest_framework.decorators import api_view, permission_classes
 from django.shortcuts import get_object_or_404
 # from .models import CustomerUser
 from rest_framework import generics, permissions, status
-
+from notifications.models import Notifications 
 CustomerUser = get_user_model()
 
 @api_view(['POST'])
@@ -22,9 +22,10 @@ def follow_user(request, user_id):
         return Response({"message": "Unfollowed successfully"})
     else:
         user_to_follow.followers.add(request.user)
+        Notifications.objects.create(recipient=user_to_follow, actor=request.user, verb="started following you")
+
         return Response({"message": "Followed successfully"})
-
-
+    
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def unfollow_user(request, user_id):
@@ -67,7 +68,7 @@ class LoginView(APIView):
 class UserProfileView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
-    queryset = CustomUser.objects.all()
+    queryset = CustomerUser.objects.all()
 
     def get(self, request):
         serializer = UserSerializer(request.user)

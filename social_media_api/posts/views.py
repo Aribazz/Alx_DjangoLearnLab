@@ -1,11 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework import viewsets, permissions, filters
-from .models import Post, Comment
+from .models import Post, Comment, Like
 from .serializers import PostSerializer, CommentSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from notifications.models import Notifications
 
 
 class IsAuthorOrReadOnly(permissions.BasePermission):
@@ -59,3 +60,44 @@ def user_feed(request):
     
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)
+
+def like_post(request, pk):
+    """Allows users to like/unlike a post."""
+    post = get_object_or_404(Post, id=pk)
+    like, created = Like.objects.get_or_create(user=request.user, post=post)
+
+    if created:
+        # Create a notification for the post author
+        Notifications.objects.create(
+            recipient=post.author,
+            actor=request.user,
+            verb="liked your post",
+            target=post
+        )
+        return Response({"message": "Post liked successfully"}, status=status.HTTP_201_CREATED)
+
+    else:
+        # If the like already exists, it means the user is unliking the post
+        like.delete()
+        return Response({"message": "Like removed"}, status=status.HTTP_200_OK)
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def comment_on_post(request, pk):
+    post = get_object_or_404(Post, id=pk)
+    comment_text = request.data.get("comment")
+
+    if not comment_text:
+        return Response({"error": "Comment cannot be empty"}, status=status.HTTP_400_BAD_REQUEST)
+
+    comment = Comment.objects.create(user=request.user, post=post, content=comment_text)
+
+    # Notify the post author
+    Notifications.objects.create(
+        recipient=post.author,
+        actor=request.user,
+        verb="commented on your post",
+        target=post
+    )
+
+    return Response({"message": "Comment added successfully"}, status=status.HTTP_201_CREATED)
