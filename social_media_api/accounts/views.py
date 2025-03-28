@@ -9,7 +9,7 @@ from .serializers import RegisterSerializer, UserSerializer
 from rest_framework.decorators import api_view, permission_classes
 from django.shortcuts import get_object_or_404
 # from .models import CustomerUser
-from rest_framework import generics
+from rest_framework import generics, permissions, status
 
 CustomerUser = get_user_model()
 
@@ -65,7 +65,7 @@ class LoginView(APIView):
     
 
 class UserProfileView(generics.RetrieveUpdateAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
 
     def get(self, request):
