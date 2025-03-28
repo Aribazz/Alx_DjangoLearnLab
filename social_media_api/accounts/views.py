@@ -64,10 +64,10 @@ class LoginView(APIView):
         return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
     
 
-class UserProfileView(generics.RetrieveUpdateAPIView):
+class UserProfileView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
-    queryset = CustomUser.objects.all()
+    queryset = CustomerUser.objects.all()
 
     def get(self, request):
         serializer = UserSerializer(request.user)
