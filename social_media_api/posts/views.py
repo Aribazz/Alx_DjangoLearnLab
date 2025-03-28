@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from notifications.models import Notification
+from rest_framework.views import APIView
 
 
 class IsAuthorOrReadOnly(permissions.BasePermission):
@@ -91,3 +92,19 @@ def comment_on_post(request, pk):
     Notification.objects.create(recipient=post.author, actor=request.user, verb="commented on your post", target=post)
 
     return Response({"message": "Comment added successfully"}, status=status.HTTP_201_CREATED)
+
+
+class UnlikePostView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        """Allows a user to unlike a post."""
+        post = get_object_or_404(Post, pk=pk)
+
+        # Find and remove the like if it exists
+        like = Like.objects.filter(user=request.user, post=post).first()
+        if like:
+            like.delete()
+            return Response({"message": "Post unliked successfully!"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"message": "You haven't liked this post yet!"}, status=status.HTTP_400_BAD_REQUEST)
